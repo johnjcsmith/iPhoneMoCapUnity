@@ -11,7 +11,7 @@ using System.Collections;
 public class IPhoneMoCapEditor  : EditorWindow
 {
 //	Thread thread = null;
-	MySocketTcp sListner = null;
+	SimpleSocketHandler sListner = null;
 
 	// Add menu named "My Window" to the Window menu
 	[MenuItem("Window/iPhoneMoCap")]
@@ -27,7 +27,7 @@ public class IPhoneMoCapEditor  : EditorWindow
 		if (GUILayout.Button (sListner == null ? "Start Listening" : "Stop Listening")) {
 			if (sListner == null) {
 				
-				sListner = new MySocketTcp ((String message)  => { 
+				sListner = new SimpleSocketHandler ((String message)  => { 
 					Debug.Log(message);
 					UnityMainThreadDispatcher.Instance().Enqueue(SetBlendShapeOnMainThread(message));
 				});
@@ -47,7 +47,7 @@ public class IPhoneMoCapEditor  : EditorWindow
 		var strArray  = cleanString.Split (new Char[] {'-'});
 
 			if (strArray.Length == 2) {
-			var weight = float.Parse (strArray.GetValue (1).ToString()) * 100;
+			var weight = float.Parse (strArray.GetValue (1).ToString());
 
 			var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
 			var index = mesh.sharedMesh.GetBlendShapeIndex (mappedShapeName);
