@@ -27,11 +27,21 @@ public class IPhoneMoCapEditor  : EditorWindow
 		if (GUILayout.Button (sListner == null ? "Start Listening" : "Stop Listening")) {
 			if (sListner == null) {
 				
-				sListner = new SimpleSocketHandler ((String message)  => { 
-					Debug.Log(message);
-					UnityMainThreadDispatcher.Instance().Enqueue(SetBlendShapeOnMainThread(message));
-				});
-				sListner.Start ();
+				if (UnityMainThreadDispatcher.Exists()) {
+
+					sListner = new SimpleSocketHandler ((String message) => { 
+						Debug.Log ("Blend shape received: " + message);
+
+						UnityMainThreadDispatcher.Instance ().Enqueue (SetBlendShapeOnMainThread (message));
+					});
+
+					sListner.Start ();
+				
+				} else {
+					Debug.LogError ("Cannot start Server. Have you added the UnityMainThreadDispatcher to your scene?");
+				}
+
+
 			} else {
 				sListner.Close();
 				sListner = null;
@@ -50,6 +60,7 @@ public class IPhoneMoCapEditor  : EditorWindow
 			var weight = float.Parse (strArray.GetValue (1).ToString());
 
 			var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
+
 			var index = mesh.sharedMesh.GetBlendShapeIndex (mappedShapeName);
 			if (index > 1) {
 				mesh.SetBlendShapeWeight (index, weight);

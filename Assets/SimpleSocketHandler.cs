@@ -45,7 +45,7 @@ public class SimpleSocketHandler : IDisposable
 	private void ListenForConnections()
 	{
 		serverTcpConnectionListener.Start();
-		Debug.Log("Listening for connections.");
+		Debug.Log("Listening for new connections.");
 
 		while (acceptingConnections)
 		{
@@ -59,7 +59,7 @@ public class SimpleSocketHandler : IDisposable
 
 	private void HandleNewConnection(IAsyncResult iar)
 	{
-		Debug.Log("New Connection.");
+		Debug.Log("New Connection Received.");
 
 		TcpListener connectionListener = (TcpListener) iar.AsyncState;
 		TcpClient client;
@@ -75,17 +75,18 @@ public class SimpleSocketHandler : IDisposable
 		}
 		catch (SocketException ex)
 		{
-			Debug.Log("Error accepting connection: " + ex.Message );
+			Debug.LogError("Unexpected error accepting connection in HandleNewConnection " + ex.Message );
 			return;
 		}
 		catch (ObjectDisposedException)
 		{
 			
-			Debug.Log("Listen canceled.");
+			Debug.Log("Connection closed.");
 			return;
 		} catch (Exception ex) 
 		{
-			Debug.Log("Something Else " + ex.Message);
+			Debug.LogError("Unexpected error accepting connection in HandleNewConnection " + ex.Message );
+			return;
 		}
 	}
 
@@ -151,7 +152,7 @@ public class SimpleSocketHandler : IDisposable
 		}
 		catch (Exception ex)
 		{
-			Debug.Log("Disconected." + ex.Message);
+			Debug.LogError("Unexpected error reading message." + ex.Message);
 		}
 	}
 
