@@ -11,7 +11,9 @@ using System.Collections;
 public class IPhoneMoCapEditor  : EditorWindow
 {
 //	Thread thread = null;
-	SimpleSocketHandler sListner = null;
+
+	SimpleUDPSocketListner sUDPListner = null;
+
 
 	// Add menu named "My Window" to the Window menu
 	[MenuItem("Window/iPhoneMoCap")]
@@ -23,31 +25,31 @@ public class IPhoneMoCapEditor  : EditorWindow
 
 	void OnGUI()
 	{
+		if (GUILayout.Button (sUDPListner == null ? "Start UDP Listener" : "Stop UDP Listener")) {
 
-		if (GUILayout.Button (sListner == null ? "Start Listening" : "Stop Listening")) {
-			if (sListner == null) {
-				
-				if (UnityMainThreadDispatcher.Exists()) {
+			if (UnityMainThreadDispatcher.Exists()) {
+				if (sUDPListner == null) {
 
-					sListner = new SimpleSocketHandler ((String message) => { 
-						Debug.Log ("Blend shape received: " + message);
+					sUDPListner = new SimpleUDPSocketListner ((String message) => { 
+
 
 						UnityMainThreadDispatcher.Instance ().Enqueue (SetBlendShapeOnMainThread (message));
+				
 					});
 
-					sListner.Start ();
-				
+					sUDPListner.Start ();
+
 				} else {
-					Debug.LogError ("Cannot start Server. Have you added the UnityMainThreadDispatcher to your scene?");
+					sUDPListner.Stop();
+
+					sUDPListner = null;
 				}
 
-
 			} else {
-				sListner.Close();
-				sListner = null;
+				Debug.LogError ("Cannot start Server. Have you added the UnityMainThreadDispatcher to your scene?");
 			}
-		};
 
+		}
 	}
 
 	public IEnumerator SetBlendShapeOnMainThread(string message) {
@@ -62,6 +64,7 @@ public class IPhoneMoCapEditor  : EditorWindow
 			var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
 
 			var index = mesh.sharedMesh.GetBlendShapeIndex (mappedShapeName);
+
 			if (index > 1) {
 				mesh.SetBlendShapeWeight (index, weight);
 			}
