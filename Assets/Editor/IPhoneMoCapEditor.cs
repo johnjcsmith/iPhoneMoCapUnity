@@ -65,7 +65,7 @@ public class IPhoneMoCapEditor  : EditorWindow
 
 			var index = mesh.sharedMesh.GetBlendShapeIndex (mappedShapeName);
 
-			if (index > 0) {
+			if (index > -1) {
 				mesh.SetBlendShapeWeight (index, weight);
 			}
 
