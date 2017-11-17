@@ -37,12 +37,5 @@ public class IPhoneMoCapEditor  : EditorWindow
 		} else {
 			GUILayout.Label ("Please run your scene to enable MeshPreview.");
 		}
-
-		if (GUILayout.Button ("Send Broadcast")) {
-			NetworkMeshAnimator.Instance.SendBroadCast ();
-		}
-
 	}
-
-
 }

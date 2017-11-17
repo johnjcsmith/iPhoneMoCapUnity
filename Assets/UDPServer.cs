@@ -4,19 +4,27 @@ using System.Net;
 using System.Text;
 using UnityEngine;
 using System.Threading;
+using System.Timers;
 
 public class UDPServer: IDisposable
 {
 
 	public static IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 49452);
-
-	private IPEndPoint broadCastIP = new IPEndPoint(IPAddress.Broadcast, 49452);
+	private static IPEndPoint broadCastIP = new IPEndPoint(IPAddress.Broadcast, 49452);
 
 	private Action<String> messageCallback;
 	private UdpClient udp = new UdpClient(remoteIP);
+	System.Timers.Timer broadcastTimer;
+
 
 	public UDPServer(Action<String> messageCallback) {
 		this.messageCallback = messageCallback;
+
+		broadcastTimer = new System.Timers.Timer();
+		broadcastTimer.Elapsed+=new ElapsedEventHandler(OnTimedEvent);
+		broadcastTimer.Interval=1000;
+		broadcastTimer.Enabled=true;
+
 	}
 
 	public void Start()
@@ -60,7 +68,7 @@ public class UDPServer: IDisposable
 		this.Stop ();
 	}
 
-	public void SendBroadCast() {
+	private static void SendBroadCastMessage() {
 		
 		UdpClient broadCastClient = new UdpClient();
 
@@ -69,6 +77,12 @@ public class UDPServer: IDisposable
 		broadCastClient.Send(bytes, bytes.Length, broadCastIP);
 		broadCastClient.Close();
 	}
+
+	private static void OnTimedEvent(object source, ElapsedEventArgs e)
+	{
+		SendBroadCastMessage ();
+	}
+
 }
 
 

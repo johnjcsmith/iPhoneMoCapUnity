@@ -95,9 +95,5 @@ public class NetworkMeshAnimator {
 
 		yield return null;
 	}
-
-	public void SendBroadCast() {
-		listner.SendBroadCast ();
-	}
 }
 
