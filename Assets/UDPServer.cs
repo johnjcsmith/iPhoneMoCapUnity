@@ -5,45 +5,37 @@ using System.Text;
 using UnityEngine;
 using System.Threading;
 
-public class SimpleUDPSocketListner: IDisposable
+public class UDPServer: IDisposable
 {
 
-	public static IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 8080);
+	public static IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 49452);
+
+	private IPEndPoint broadCastIP = new IPEndPoint(IPAddress.Broadcast, 49452);
 
 	private Action<String> messageCallback;
-	private bool isRunning = false;
 	private UdpClient udp = new UdpClient(remoteIP);
 
-	public SimpleUDPSocketListner(Action<String> messageCallback) {
+	public UDPServer(Action<String> messageCallback) {
 		this.messageCallback = messageCallback;
 	}
 
 	public void Start()
 	{
 
-		Debug.Log("Started listening to UDP connection");
-		isRunning = true;
-
 		StartListening();
+		Debug.Log("Started listening to UDP connection");
 	}
+
 	public void Stop()
 	{
-
-		isRunning = false;
-
 		try
 		{
 			udp.Close();
-
 			Debug.Log("Stopped listening to UDP connection");
 		}
 		catch (Exception ex) { 
 			Debug.LogError ("Error closing connection: " + ex.Message);
 		}
-	}
-
-	public bool IsRunning() {
-		return isRunning;
 	}
 
 
@@ -55,6 +47,7 @@ public class SimpleUDPSocketListner: IDisposable
 
 	private void Receive(IAsyncResult ar)
 	{
+			
 		byte[] bytes = udp.EndReceive(ar, ref remoteIP);
 		string message = Encoding.ASCII.GetString(bytes);
 
@@ -64,8 +57,17 @@ public class SimpleUDPSocketListner: IDisposable
 	}
 
 	public void Dispose() {
-
 		this.Stop ();
+	}
+
+	public void SendBroadCast() {
+		
+		UdpClient broadCastClient = new UdpClient();
+
+
+		byte[] bytes = Encoding.ASCII.GetBytes("iPhoneMoCapBroadCast");
+		broadCastClient.Send(bytes, bytes.Length, broadCastIP);
+		broadCastClient.Close();
 	}
 }
 

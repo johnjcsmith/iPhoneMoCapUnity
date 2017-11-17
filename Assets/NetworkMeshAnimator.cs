@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class NetworkMeshAnimator {
 
-	private SimpleUDPSocketListner listner;
+	private UDPServer listner;
 	private SkinnedMeshRenderer meshTarget;
 	private UnityMainThreadDispatcher dispatcher;
 	private bool isAcceptingMessages = false;
@@ -26,7 +26,7 @@ public class NetworkMeshAnimator {
 
 	private NetworkMeshAnimator() {
 		
-		this.listner  = new SimpleUDPSocketListner ((String message) => { 
+		this.listner  = new UDPServer ((String message) => { 
 			if (isAcceptingMessages) {
 				dispatcher.Enqueue (SetBlendShapeOnMainThread (message));
 			}
@@ -94,6 +94,10 @@ public class NetworkMeshAnimator {
 		}
 
 		yield return null;
+	}
+
+	public void SendBroadCast() {
+		listner.SendBroadCast ();
 	}
 }
 
