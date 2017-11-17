@@ -26,11 +26,11 @@ public class IPhoneMoCapEditor  : EditorWindow
 
 		if (EditorApplication.isPlaying) {
 
-			if (GUILayout.Button (NetworkMeshAnimator.Instance.isRunning () ? "Dissable Mesh Preview" : "Enable Mesh Preview")) {
-				if (NetworkMeshAnimator.Instance.isRunning ()) {
-					NetworkMeshAnimator.Instance.Stop ();
+			if (GUILayout.Button (NetworkMeshAnimator.Instance.IsAcceptingMessages () ? "Dissable Mesh Preview" : "Enable Mesh Preview")) {
+				if (NetworkMeshAnimator.Instance.IsAcceptingMessages ()) {
+					NetworkMeshAnimator.Instance.StopAcceptingMessages ();
 				} else {
-					NetworkMeshAnimator.Instance.Start ();
+					NetworkMeshAnimator.Instance.StartAcceptingMessages ();
 				}
 			}
 
