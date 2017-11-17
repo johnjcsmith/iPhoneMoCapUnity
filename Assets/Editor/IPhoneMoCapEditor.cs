@@ -12,11 +12,9 @@ public class IPhoneMoCapEditor  : EditorWindow
 {
 //	Thread thread = null;
 
-	SimpleUDPSocketListner sUDPListner = null;
 
 
-	// Add menu named "My Window" to the Window menu
-	[MenuItem("Window/iPhoneMoCap")]
+	[MenuItem("iPhoneMoCap/MeshPreview")]
 	static void Init()
 	{
 		IPhoneMoCapEditor window = (IPhoneMoCapEditor)EditorWindow.GetWindow(typeof(IPhoneMoCapEditor));
@@ -25,51 +23,23 @@ public class IPhoneMoCapEditor  : EditorWindow
 
 	void OnGUI()
 	{
-		if (GUILayout.Button (sUDPListner == null ? "Start UDP Listener" : "Stop UDP Listener")) {
 
-			if (UnityMainThreadDispatcher.Exists()) {
-				if (sUDPListner == null) {
+		if (EditorApplication.isPlaying) {
 
-					sUDPListner = new SimpleUDPSocketListner ((String message) => { 
-
-
-						UnityMainThreadDispatcher.Instance ().Enqueue (SetBlendShapeOnMainThread (message));
-				
-					});
-
-					sUDPListner.Start ();
-
+			if (GUILayout.Button (NetworkMeshAnimator.Instance.isRunning () ? "Dissable Mesh Preview" : "Enable Mesh Preview")) {
+				if (NetworkMeshAnimator.Instance.isRunning ()) {
+					NetworkMeshAnimator.Instance.Stop ();
 				} else {
-					sUDPListner.Stop();
-
-					sUDPListner = null;
+					NetworkMeshAnimator.Instance.Start ();
 				}
-
-			} else {
-				Debug.LogError ("Cannot start Server. Have you added the UnityMainThreadDispatcher to your scene?");
 			}
 
+		} else {
+			GUILayout.Label ("Please run your scene to enable MeshPreview.");
 		}
+
+
 	}
 
-	public IEnumerator SetBlendShapeOnMainThread(string message) {
-		var mesh = GameObject.Find ("BlendShapeTarget").GetComponent<SkinnedMeshRenderer> ();
 
-		var cleanString = message.Replace (" ", "").Replace ("msg:", "");
-		var strArray  = cleanString.Split (new Char[] {'-'});
-
-			if (strArray.Length == 2) {
-			var weight = float.Parse (strArray.GetValue (1).ToString());
-
-			var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
-
-			var index = mesh.sharedMesh.GetBlendShapeIndex (mappedShapeName);
-
-			if (index > -1) {
-				mesh.SetBlendShapeWeight (index, weight);
-			}
-
-		}
-		yield return null;
-	}
 }

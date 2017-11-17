@@ -8,10 +8,9 @@ using System.Threading;
 public class SimpleUDPSocketListner: IDisposable
 {
 	private Action<String> messageCallback;
-
+	private bool isRunning = false;
 
 	public static IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 8080);
-
 
 	public SimpleUDPSocketListner(Action<String> messageCallback) {
 		this.messageCallback = messageCallback;
@@ -20,19 +19,27 @@ public class SimpleUDPSocketListner: IDisposable
 	public void Start()
 	{
 
-		Debug.Log("Started listening");
+		Debug.Log("Started listening to connection");
+		isRunning = true;
 		StartListening();
 	}
 	public void Stop()
 	{
+
+		isRunning = false;
+
 		try
 		{
 			udp.Close();
-			Debug.Log("Stopped listening");
+			Debug.Log("Stopped listening to connection");
 		}
 		catch (Exception ex) { 
 			Debug.LogError ("Error closing connection: " + ex.Message);
 		}
+	}
+
+	public bool IsRunning() {
+		return isRunning;
 	}
 
 	private readonly UdpClient udp = new UdpClient(remoteIP);
