@@ -28,7 +28,7 @@ public class NetworkMeshAnimator {
 		
 		this.listner  = new UDPServer ((String message) => { 
 			if (isAcceptingMessages) {
-				dispatcher.Enqueue (SetBlendShapeOnMainThread (message));
+				dispatcher.Enqueue (SetBlendShapesOnMainThread (message));
 			}
 		});
 
@@ -76,20 +76,23 @@ public class NetworkMeshAnimator {
 		return isAcceptingMessages;
 	}
 
-	public IEnumerator SetBlendShapeOnMainThread(string message) {
-		
-		var cleanString = message.Replace (" ", "").Replace ("msg:", "");
-		var strArray  = cleanString.Split (new Char[] {'-'});
+	public IEnumerator SetBlendShapesOnMainThread(string messageString) {
 
-		if (strArray.Length == 2) {
-			var weight = float.Parse (strArray.GetValue (1).ToString());
+		foreach (string message in messageString.Split (new Char[] { '|' }))
+		{
+			var cleanString = message.Replace (" ", "").Replace ("msg:", "");
+			var strArray  = cleanString.Split (new Char[] {'-'});
 
-			var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
+			if (strArray.Length == 2) {
+				var weight = float.Parse (strArray.GetValue (1).ToString());
 
-			var index = meshTarget.sharedMesh.GetBlendShapeIndex (mappedShapeName);
+				var mappedShapeName = strArray.GetValue (0).ToString ().Replace ("_L", "Left").Replace ("_R", "Right");
 
-			if (index > -1) {
-				meshTarget.SetBlendShapeWeight (index, weight);
+				var index = meshTarget.sharedMesh.GetBlendShapeIndex (mappedShapeName);
+
+				if (index > -1) {
+					meshTarget.SetBlendShapeWeight (index, weight);
+				}
 			}
 		}
 
